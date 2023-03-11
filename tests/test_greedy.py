@@ -3,8 +3,8 @@ Test Cases for greedy shortest super-string algorithm
 """
 from unittest import TestCase
 from modules.FastxFiles import reads_from_fastq as fastq
-from modules.overlaps import overlap, build_dictionary, overlap_all_pairs
-from modules.greedySuperString import greedySuperString
+from modules.overlaps import overlap, buildKMerDictionary, buildOverlapGraph
+from modules.greedySuperString import greedy_scs
 
 class TestGreedySS(TestCase):
     """ Testing greedy shortest super-string algorithm """
@@ -71,14 +71,14 @@ class TestGreedySS(TestCase):
             'oob': {'foobarbaz', 'foobaz'}
         }
         min_length = 3
-        res_dict = build_dictionary(['foobarbaz', 'foobaz'], min_length)
+        res_dict = buildKMerDictionary(['foobarbaz', 'foobaz'], min_length)
         self.assertEqual(test_dict, res_dict)
 
     def test_overlap_all(self):
         """ It should return a set of ordered tuples """
         test_reads = ['CGTACG', 'TACGTA', 'GTACGT', 'ACGTAC', 'GTACGA', 'TACGAT']
         min_len = 4
-        results = overlap_all_pairs(test_reads, min_len)
+        results = buildOverlapGraph(test_reads, min_len)
         expected = {
             ('CGTACG', 'TACGTA', 4),
             ('CGTACG', 'GTACGT', 5),
@@ -98,7 +98,7 @@ class TestGreedySS(TestCase):
     def test_super_string(self):
         """ It should return a super-string """
         strings = ['CCT', 'CTT', 'TGC', 'TGG', 'GAT', 'ATT']
-        result = greedySuperString(strings)
+        result = greedy_scs(strings, 1)
         is_super = True
         for s in strings:
             is_super = s in result
@@ -107,5 +107,5 @@ class TestGreedySS(TestCase):
     def test_super_string_fastq(self):
         """ It should return a super-string """
         expected = 15894
-        result = greedySuperString(self.reads)
+        result = greedy_scs(self.reads, 30)
         self.assertEqual(expected, len(result))

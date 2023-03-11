@@ -25,8 +25,9 @@ def overlap(str1, str2, min_len=3):
         pos += 1
 
 
-def build_dictionary(reads, k_len=3):
-    """ Builds a dictionary that associates each k-mer of length 'min_len' with
+def buildKMerDictionary(reads, k_len=3):
+    """ Builds a dictionary that associates each k-mer of length 'k_len' with
+        each read that contains k-mer
 
 
     Args:
@@ -38,6 +39,8 @@ def build_dictionary(reads, k_len=3):
                     value: a set consisting of the reads that contain k-mer
     """
     dict = {}
+    if dict != {}:
+        dict.clear()
     # Get each read from the list of reads
     for read in reads:
         # Get each k-mer from the read, do not run over the end of read
@@ -51,44 +54,63 @@ def build_dictionary(reads, k_len=3):
     return dict
 
 
-def overlap_all_pairs(reads, min_len=3):
-    """ Generate a set of all pairs of reads in a list of reads that have an
-        overlap of at least min_len
+def buildOverlapGraph(reads, k_len=3):
+    """ Generate a graph as a set of all pairs of reads in a list of reads that
+        have an overlap of at least k_len
 
     Args:
         reads (list( str )): A list of reads from a genome
-        min_len (int, optional): The minimum length of overlap. Defaults to 3.
+        k_len (int, optional): The minimum length of overlap. Defaults to 3.
 
     Returns:
         set( tuple ): A set of tuples. Each tuple consists of a pair of reads
-                        that overlap by at least min_len.
+                        that overlap by at least k_len.
     """
-    pairs = set()
+    graph = set()
     compared = set()
+    if graph is not None:
+        graph.clear()
+    if compared is not None:
+        compared.clear()
 
     # build a dictionary of k-mers and the reads that contain them
-    dict = build_dictionary(reads, min_len)
+    dict = buildKMerDictionary(reads, k_len)
 
     # Get each read from the list
     for read1 in reads:
 
         # Get each read that contains the k-length suffix of read1
-        for read2 in list(dict[read1[-min_len::]]):
-
-            # Don't call overlap if read1 doesn't contain read2's prefix
-            if read1 not in dict[read2[:min_len:]]:
-                continue
+        for read2 in list(dict[read1[-k_len::]]):
 
             # Don't call overlap if read1 == read2 or we've already compared
-            elif read1 == read2 or (read1, read2) in compared:
+            if read1 == read2 or (read1, read2) in compared:
                 continue
 
             # Call overlap and add the reads to compared
             else:
-                olap = overlap(read1, read2, min_len)
+                olap = overlap(read1, read2, k_len)
                 compared.add((read1, read2))
 
                 # Add the reads to pairs if there is an overlap
                 if olap > 0:
-                    pairs.add((read1, read2, olap))
-    return pairs
+                    graph.add((read1, read2, olap))
+    return graph
+
+
+def getLargestOverlap(reads, k_len=3):
+    """ Find the longest overlap in a list of reads
+
+    Args:
+        reads ( list( str )): A list of reads
+        k_len (int, optional): The length of k-mers. Defaults to 3.
+
+    Returns:
+        tuple ( str, str, int ): The 2 reads with longest overlap
+    """
+    read1, read2 = None, None
+    longest_overlap = 0
+    for r1, r2, olap in list(buildOverlapGraph(reads, k_len)):
+        if olap > longest_overlap:
+            read1, read2 = r1, r2
+            longest_overlap = olap
+    return read1, read2, longest_overlap
