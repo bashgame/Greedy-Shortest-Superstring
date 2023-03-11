@@ -103,3 +103,9 @@ class TestGreedySS(TestCase):
         for s in strings:
             is_super = s in result
         self.assertTrue(is_super)
+
+    def test_super_string_fastq(self):
+        """ It should return a super-string """
+        expected = 15894
+        result = greedySuperString(self.reads)
+        self.assertEqual(expected, len(result))

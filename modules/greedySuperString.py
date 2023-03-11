@@ -27,5 +27,5 @@ def greedySuperString(reads, max_len=-1):
             read1, read2 = longest_pairs[randrange(len(longest_pairs))]
             reads.remove(read1)
             reads.remove(read2)
-            reads.append(read2 + read1[longest:])
+            reads.append(read1 + read2[longest:])
     return sup_string.join(reads)
