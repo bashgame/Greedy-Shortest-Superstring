@@ -4,6 +4,7 @@ Test Cases for greedy shortest super-string algorithm
 from unittest import TestCase
 from modules.FastxFiles import reads_from_fastq as fastq
 from modules.overlaps import overlap, build_dictionary, overlap_all_pairs
+from modules.greedySuperString import greedySuperString
 
 class TestGreedySS(TestCase):
     """ Testing greedy shortest super-string algorithm """
@@ -79,18 +80,18 @@ class TestGreedySS(TestCase):
         min_len = 4
         results = overlap_all_pairs(test_reads, min_len)
         expected = {
-            ('CGTACG', 'TACGTA'),
-            ('CGTACG', 'GTACGT'),
-            ('CGTACG', 'GTACGA'),
-            ('CGTACG', 'TACGAT'),
-            ('TACGTA', 'ACGTAC'),
-            ('TACGTA', 'CGTACG'),
-            ('GTACGT', 'TACGTA'),
-            ('GTACGT', 'ACGTAC'),
-            ('ACGTAC', 'GTACGA'),
-            ('ACGTAC', 'GTACGT'),
-            ('ACGTAC', 'CGTACG'),
-            ('GTACGA', 'TACGAT')
+            ('CGTACG', 'TACGTA', 4),
+            ('CGTACG', 'GTACGT', 5),
+            ('CGTACG', 'GTACGA', 5),
+            ('CGTACG', 'TACGAT', 4),
+            ('TACGTA', 'ACGTAC', 5),
+            ('TACGTA', 'CGTACG', 4),
+            ('GTACGT', 'TACGTA', 5),
+            ('GTACGT', 'ACGTAC', 4),
+            ('ACGTAC', 'GTACGA', 4),
+            ('ACGTAC', 'GTACGT', 4),
+            ('ACGTAC', 'CGTACG', 5),
+            ('GTACGA', 'TACGAT', 5)
         }
         self.assertEqual(expected, results)
 
@@ -98,4 +99,7 @@ class TestGreedySS(TestCase):
         """ It should return a super-string """
         strings = ['CCT', 'CTT', 'TGC', 'TGG', 'GAT', 'ATT']
         result = greedySuperString(strings)
-        self.assertIn(strings, result)
+        is_super = True
+        for s in strings:
+            is_super = s in result
+        self.assertTrue(is_super)

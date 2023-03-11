@@ -90,5 +90,5 @@ def overlap_all_pairs(reads, min_len=3):
 
                 # Add the reads to pairs if there is an overlap
                 if olap > 0:
-                    pairs.add((read1, read2))
+                    pairs.add((read1, read2, olap))
     return pairs
